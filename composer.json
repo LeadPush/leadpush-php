@@ -1,0 +1,37 @@
+{
+  "name": "leadpush/sdk-php",
+  "description": "Official PHP SDK for Leadpush",
+  "homepage": "https://github.com/LeadPush/leadpush-php",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Brandon Bronisz",
+      "email": "brandon@leadpush.io"
+    }
+  ],
+  "require": {
+    "php": "^8.2",
+    "symfony/http-client": "^7.4"
+  },
+  "require-dev": {
+    "pestphp/pest": "^3.0|^4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Leadpush\\SDK\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Leadpush\\SDK\\Test\\": "tests"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/pest"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}
