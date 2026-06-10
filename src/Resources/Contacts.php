@@ -31,10 +31,48 @@ class Contacts extends Entity
     }
 
     /**
-     * Access event API operations for a contact.
+     * Get a contact by uuid or workspace identity value.
      */
-    public function events(string $contactId): ContactEvents
+    public function get(string $identifier): ContactModel
     {
-        return new ContactEvents($this->client, $contactId);
+        return parent::get($identifier);
+    }
+
+    /**
+     * Update a contact by uuid or workspace identity value.
+     *
+     * @param array<string, mixed> $data Contact update payload.
+     */
+    public function update(string $identifier, array $data): ContactModel
+    {
+        return parent::update($identifier, $data);
+    }
+
+    /**
+     * Subscribe a contact by uuid or workspace identity value.
+     */
+    public function subscribe(string $identifier): ContactModel
+    {
+        $payload = $this->postResource([$identifier, 'subscribe']);
+
+        return $this->makeModel($payload['data']);
+    }
+
+    /**
+     * Unsubscribe a contact by uuid or workspace identity value.
+     */
+    public function unsubscribe(string $identifier): ContactModel
+    {
+        $payload = $this->postResource([$identifier, 'unsubscribe']);
+
+        return $this->makeModel($payload['data']);
+    }
+
+    /**
+     * Access event API operations for a contact by uuid or workspace identity value.
+     */
+    public function events(string $identifier): ContactEvents
+    {
+        return new ContactEvents($this->client, $identifier);
     }
 }

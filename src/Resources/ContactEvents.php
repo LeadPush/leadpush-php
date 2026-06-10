@@ -15,8 +15,10 @@ class ContactEvents extends ListableResource
 {
     /**
      * Create a contact events resource handler.
+     *
+     * @param string $contactIdentifier Contact uuid or workspace identity value.
      */
-    public function __construct(Leadpush $client, private readonly string $contactId)
+    public function __construct(Leadpush $client, private readonly string $contactIdentifier)
     {
         parent::__construct($client);
     }
@@ -48,7 +50,7 @@ class ContactEvents extends ListableResource
      */
     protected function endpoint(): string|array
     {
-        return ['contacts', $this->contactId, 'events'];
+        return ['contacts', $this->contactIdentifier, 'events'];
     }
 
     /**

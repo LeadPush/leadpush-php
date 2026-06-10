@@ -44,6 +44,26 @@ it('lists contact events from the contacts resource', function () {
         ->and($response->getRequestUrl())->toBe(testBaseUrl() . '/contacts/' . contactData()['uuid'] . '/events?page=2&per_page=1&search=purchase');
 });
 
+it('lists contact events by workspace identity value', function () {
+    $response = jsonResponse([
+        'data' => [contactEventData()],
+        'meta' => [
+            'current_page' => 1,
+            'per_page' => 10,
+            'total' => 1,
+            'last_page' => 1,
+            'has_next' => false,
+        ],
+    ]);
+    [$client] = createClient([$response]);
+
+    $events = $client->contacts()->events('contact@example.com')->list();
+
+    expect($events->data()[0])->toBeInstanceOf(ContactEventModel::class)
+        ->and($events->data()[0]->uuid())->toBe(contactEventData()['uuid'])
+        ->and($response->getRequestUrl())->toBe(testBaseUrl() . '/contacts/contact%40example.com/events');
+});
+
 it('lists contact events from an attached contact model', function () {
     $contactResponse = jsonResponse([
         'data' => contactData(),
@@ -76,6 +96,24 @@ it('creates contact events', function () {
     expect($result)->toBeNull()
         ->and($response->getRequestMethod())->toBe('POST')
         ->and($response->getRequestUrl())->toBe(testBaseUrl() . '/contacts/' . contactData()['uuid'] . '/events')
+        ->and($response->getRequestOptions()['body'])->toBe(json_encode([
+            'event_name' => createContactEventData()['event_name'],
+            'attributes' => json_encode(createContactEventData()['attributes'], JSON_THROW_ON_ERROR),
+        ], JSON_THROW_ON_ERROR))
+        ->and(requestHeaders($response))->toContain(...expectedHeaderLines([
+            'Content-Type' => 'application/json',
+        ]));
+});
+
+it('creates contact events by workspace identity value', function () {
+    $response = emptyResponse();
+    [$client] = createClient([$response]);
+
+    $result = $client->contacts()->events('contact@example.com')->create(createContactEventData());
+
+    expect($result)->toBeNull()
+        ->and($response->getRequestMethod())->toBe('POST')
+        ->and($response->getRequestUrl())->toBe(testBaseUrl() . '/contacts/contact%40example.com/events')
         ->and($response->getRequestOptions()['body'])->toBe(json_encode([
             'event_name' => createContactEventData()['event_name'],
             'attributes' => json_encode(createContactEventData()['attributes'], JSON_THROW_ON_ERROR),
