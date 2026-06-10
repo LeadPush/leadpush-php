@@ -5,10 +5,12 @@ declare(strict_types=1);
 use Leadpush\SDK\Leadpush;
 use Symfony\Component\HttpClient\MockHttpClient;
 
+use function Leadpush\SDK\Test\Support\installedSdkVersion;
+
 it('exposes the SDK version and key', function () {
     $client = new Leadpush('test-key', httpClient: new MockHttpClient());
 
-    expect($client->version())->toBe('dev-main')
+    expect($client->version())->toBe(installedSdkVersion())
         ->and($client->key())->toBe('test-key');
 });
 
@@ -19,7 +21,7 @@ it('sets production request defaults', function () {
         'baseUrl' => Leadpush::DEFAULT_BASE_URL,
         'timeout' => Leadpush::DEFAULT_TIMEOUT,
         'headers' => [],
-        'userAgent' => Leadpush::defaultUserAgent('dev-main'),
+        'userAgent' => Leadpush::defaultUserAgent(installedSdkVersion()),
     ]);
 });
 

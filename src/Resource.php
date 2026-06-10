@@ -118,14 +118,14 @@ abstract class Resource
      */
     private function pathSegments(string|array $path): array
     {
-        $segments = is_string($path) ? [$path] : $path;
+        $segments = is_string($path) ? explode('/', $path) : $path;
         $parts = [];
 
         foreach ($segments as $segment) {
-            foreach (explode('/', (string) $segment) as $part) {
-                if ($part !== '') {
-                    $parts[] = $part;
-                }
+            $part = (string) $segment;
+
+            if ($part !== '') {
+                $parts[] = $part;
             }
         }
 

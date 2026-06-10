@@ -32,6 +32,18 @@ it('makes a DELETE request', function () {
         ->and(requestHeaders($response))->toContain(...expectedHeaderLines());
 });
 
+it('encodes array path segments without splitting them', function () {
+    $response = jsonResponse([
+        'ok' => true,
+    ]);
+    [$client] = createClient([$response]);
+
+    $result = $client->get(['contacts', 'team/a@example.com', 'events']);
+
+    expect($result)->toBe(['ok' => true])
+        ->and($response->getRequestUrl())->toBe(testBaseUrl() . '/contacts/team%2Fa%40example.com/events');
+});
+
 it('passes POST bodies and additional headers', function () {
     $response = emptyResponse();
     [$client] = createClient([$response], options: [

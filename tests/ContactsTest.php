@@ -31,6 +31,22 @@ it('gets a contact by uuid', function () {
         ->and(requestHeaders($response))->toContain(...expectedHeaderLines());
 });
 
+it('gets a contact by workspace identity value', function () {
+    $response = jsonResponse([
+        'data' => contactData(),
+    ]);
+    [$client] = createClient([$response]);
+
+    $contact = $client->contacts()->get('contact@example.com');
+
+    expect($contact)->toBeInstanceOf(ContactModel::class)
+        ->and($contact->uuid())->toBe(contactData()['uuid'])
+        ->and($contact->attributes()['email'])->toBe(contactData()['attributes']['email'])
+        ->and($response->getRequestMethod())->toBe('GET')
+        ->and($response->getRequestUrl())->toBe(testBaseUrl() . '/contacts/contact%40example.com')
+        ->and(requestHeaders($response))->toContain(...expectedHeaderLines());
+});
+
 it('creates a contact', function () {
     $response = jsonResponse([
         'data' => contactData(),
@@ -62,6 +78,52 @@ it('updates a contact by uuid', function () {
         ->and($response->getRequestMethod())->toBe('POST')
         ->and($response->getRequestUrl())->toBe(testBaseUrl() . '/contacts/69474ed13511f060ca09781a')
         ->and($response->getRequestOptions()['body'])->toBe(json_encode(updateContactData(), JSON_THROW_ON_ERROR));
+});
+
+it('updates a contact by workspace identity value', function () {
+    $response = jsonResponse([
+        'data' => updatedContactData(),
+    ]);
+    [$client] = createClient([$response]);
+
+    $contact = $client->contacts()->update('contact@example.com', updateContactData());
+
+    expect($contact)->toBeInstanceOf(ContactModel::class)
+        ->and($contact->uuid())->toBe(contactData()['uuid'])
+        ->and($contact->attributes()['first_name'])->toBe('Updated')
+        ->and($response->getRequestMethod())->toBe('POST')
+        ->and($response->getRequestUrl())->toBe(testBaseUrl() . '/contacts/contact%40example.com')
+        ->and($response->getRequestOptions()['body'])->toBe(json_encode(updateContactData(), JSON_THROW_ON_ERROR));
+});
+
+it('subscribes a contact by workspace identity value', function () {
+    $response = jsonResponse([
+        'data' => contactData(),
+    ]);
+    [$client] = createClient([$response]);
+
+    $contact = $client->contacts()->subscribe('contact@example.com');
+
+    expect($contact)->toBeInstanceOf(ContactModel::class)
+        ->and($contact->isSubscribed())->toBeTrue()
+        ->and($response->getRequestMethod())->toBe('POST')
+        ->and($response->getRequestUrl())->toBe(testBaseUrl() . '/contacts/contact%40example.com/subscribe')
+        ->and(requestHeaders($response))->not->toContain('Content-Type: application/json');
+});
+
+it('unsubscribes a contact by workspace identity value', function () {
+    $response = jsonResponse([
+        'data' => unsubscribedContactData(),
+    ]);
+    [$client] = createClient([$response]);
+
+    $contact = $client->contacts()->unsubscribe('contact@example.com');
+
+    expect($contact)->toBeInstanceOf(ContactModel::class)
+        ->and($contact->isSubscribed())->toBeFalse()
+        ->and($response->getRequestMethod())->toBe('POST')
+        ->and($response->getRequestUrl())->toBe(testBaseUrl() . '/contacts/contact%40example.com/unsubscribe')
+        ->and(requestHeaders($response))->not->toContain('Content-Type: application/json');
 });
 
 it('updates an attached contact model', function () {

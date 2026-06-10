@@ -57,10 +57,13 @@ You can pass a Symfony `HttpClientInterface` as the third constructor argument f
 
 ## Contacts
 
+Contact methods that accept a contact identifier can use either the contact uuid or the workspace identity field value, such as an email address.
+
 **Get A Contact**
 
 ```php
 $contact = $client->contacts()->get('contact_uuid');
+$sameContact = $client->contacts()->get('person@example.com');
 
 echo $contact->uuid();
 echo $contact->attributes()['email'];
@@ -78,7 +81,7 @@ $contact = $client->contacts()->create([
 ]);
 ```
 
-**Update By Id**
+**Update A Contact**
 
 ```php
 $contact = $client->contacts()->update('contact_uuid', [
@@ -86,6 +89,10 @@ $contact = $client->contacts()->update('contact_uuid', [
     'attributes' => [
         'first_name' => 'Updated',
     ],
+]);
+
+$client->contacts()->update('person@example.com', [
+    'subscribed' => true,
 ]);
 ```
 
@@ -103,6 +110,9 @@ $contact->update();
 **Subscribe Or Unsubscribe**
 
 ```php
+$client->contacts()->subscribe('person@example.com');
+$client->contacts()->unsubscribe('person@example.com');
+
 $contact->subscribe();
 $contact->unsubscribe();
 ```
@@ -113,6 +123,8 @@ $contact->unsubscribe();
 $events = $client->contacts()->events('contact_uuid')->list([
     'search' => 'purchase',
 ]);
+
+$sameEvents = $client->contacts()->events('person@example.com')->list();
 ```
 
 You can also access events from an attached contact model:
@@ -130,6 +142,10 @@ $client->contacts()->events('contact_uuid')->create([
     'attributes' => [
         'plan' => 'enterprise',
     ],
+]);
+
+$client->contacts()->events('person@example.com')->create([
+    'event_name' => 'purchase',
 ]);
 ```
 

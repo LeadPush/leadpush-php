@@ -41,16 +41,26 @@ function createClient(array $responses = [], string $key = 'test-key', array $op
     return [$client, $http];
 }
 
+function installedSdkVersion(): string
+{
+    try {
+        return \Composer\InstalledVersions::getPrettyVersion(Leadpush::SDK_NAME) ?: 'dev-main';
+    } catch (\Throwable) {
+        return 'dev-main';
+    }
+}
+
 function expectedHeaderLines(array $headers = [], string $key = 'test-key', string $userAgent = ''): array
 {
-    $userAgent = $userAgent === '' ? Leadpush::defaultUserAgent('dev-main') : $userAgent;
+    $version = installedSdkVersion();
+    $userAgent = $userAgent === '' ? Leadpush::defaultUserAgent($version) : $userAgent;
 
     return array_merge([
         'Accept: application/json',
         "Authorization: Bearer {$key}",
         'X-Leadpush-API-Version: ' . Leadpush::API_VERSION,
         'X-Leadpush-SDK: ' . Leadpush::SDK_NAME,
-        'X-Leadpush-SDK-Version: dev-main',
+        "X-Leadpush-SDK-Version: {$version}",
         'User-Agent: ' . $userAgent,
     ], array_map(
         fn (string $name, string $value): string => "{$name}: {$value}",
