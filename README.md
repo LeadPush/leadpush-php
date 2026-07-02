@@ -250,6 +250,37 @@ $domain = $client->domains()->get('domain_uuid');
 $addresses = $domain->addresses()->list();
 ```
 
+## Emails
+
+**Send An Email**
+
+```php
+$send = $client->emails()->send([
+    'from' => 'sender@example.com',
+    'subject' => 'Developer API email',
+    'html' => '<p>Hello world</p>',
+    'text' => 'Hello world',
+    'to' => [
+        'known@example.com',
+        'other@example.com',
+    ],
+    'bcc' => [
+        'audit@example.com',
+    ],
+    'reply_to' => 'reply@example.com',
+    'headers' => [
+        'X-Correlation-ID' => 'abc-123',
+        'Auto-Submitted' => 'auto-generated',
+    ],
+]);
+
+echo $send->isAccepted() ? 'accepted' : 'rejected';
+echo $send->messageCount();
+echo $send->messages()[0]['uuid'];
+```
+
+The `from` address must be a verified sendable address in the API key workspace. Provide `html`, `text`, or both, and at least one recipient across `to` and `bcc`. Leadpush creates one tracked message per unique recipient and returns those message identifiers with initial `pending` status.
+
 ## Fields
 
 **List Fields**
