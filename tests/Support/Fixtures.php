@@ -207,6 +207,67 @@ function createDomainAddressData(): array
     ];
 }
 
+function createEmailData(): array
+{
+    return [
+        'from' => 'sender@developer.test',
+        'subject' => 'Developer API email',
+        'html' => '<p>Hello world</p>',
+        'text' => 'Hello world',
+        'to' => [
+            'known@example.test',
+            'other@example.test',
+            'third@example.test',
+        ],
+        'bcc' => [
+            'audit@example.test',
+        ],
+        'reply_to' => 'reply@example.test',
+        'headers' => [
+            'X-Correlation-ID' => 'abc-123',
+            'Auto-Submitted' => 'auto-generated',
+        ],
+    ];
+}
+
+function emailSendData(): array
+{
+    return [
+        'accepted' => true,
+        'message_count' => 4,
+        'messages' => [
+            [
+                'uuid' => 'message-known-uuid',
+                'recipient' => 'known@example.test',
+                'type' => 'to',
+                'from' => 'sender@developer.test',
+                'status' => 'pending',
+            ],
+            [
+                'uuid' => 'message-other-uuid',
+                'recipient' => 'other@example.test',
+                'type' => 'to',
+                'from' => 'sender@developer.test',
+                'status' => 'pending',
+            ],
+            [
+                'uuid' => 'message-third-uuid',
+                'recipient' => 'third@example.test',
+                'type' => 'to',
+                'from' => 'sender@developer.test',
+                'status' => 'pending',
+            ],
+            [
+                'uuid' => 'message-audit-uuid',
+                'recipient' => 'audit@example.test',
+                'type' => 'bcc',
+                'from' => 'sender@developer.test',
+                'status' => 'pending',
+            ],
+        ],
+    ];
+}
+
 function suppressionData(): array
 {
     return [
