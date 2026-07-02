@@ -182,6 +182,74 @@ foreach ($client->contacts()->cursor(['per_page' => 100]) as $page) {
 }
 ```
 
+## Domains
+
+**List Domains**
+
+```php
+$domains = $client->domains()->list([
+    'search' => 'example',
+    'page' => 1,
+    'per_page' => 10,
+]);
+```
+
+**Create A Domain**
+
+```php
+$domain = $client->domains()->create([
+    'name' => 'example.com',
+    'dkim_selectors' => ['default'],
+    'tracking_subdomain' => 'click',
+    'tracking_mode' => 'cloudflare',
+]);
+
+print_r($domain->dns());
+```
+
+**Verify Or Delete A Domain**
+
+```php
+$verified = $client->domains()->verify($domain->uuid());
+
+$client->domains()->delete($domain->uuid());
+```
+
+You can also verify or delete from an attached domain model:
+
+```php
+$domain = $client->domains()->get('domain_uuid');
+
+$domain->verify();
+$domain->delete();
+```
+
+**Domain Addresses**
+
+```php
+$addresses = $client->domains()->addresses('domain_uuid')->list();
+
+$address = $client->domains()->addresses('domain_uuid')->create([
+    'address' => 'sender',
+    'display_name' => 'Sender Name',
+    'reply_to' => 'reply@example.com',
+    'company_address' => '123 Main St',
+    'company_city' => 'New York',
+    'company_state' => 'NY',
+    'company_zip' => '10001',
+    'company_country' => 'US',
+]);
+
+$client->domains()->addresses('domain_uuid')->delete($address->uuid());
+```
+
+You can also access addresses from an attached domain model:
+
+```php
+$domain = $client->domains()->get('domain_uuid');
+$addresses = $domain->addresses()->list();
+```
+
 ## Fields
 
 **List Fields**
