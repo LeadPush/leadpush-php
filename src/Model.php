@@ -128,7 +128,7 @@ abstract class Model
      * @param string|array<int, string> $path
      * @param array<string, mixed> $params
      */
-    protected function delete(string|array $path, array $params = []): mixed
+    protected function requestDelete(string|array $path, array $params = []): mixed
     {
         return $this->requireContext()->delete($path, $params);
     }

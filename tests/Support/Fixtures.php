@@ -120,6 +120,93 @@ function fieldFilters(): array
     ];
 }
 
+function domainData(): array
+{
+    return [
+        'uuid' => 'domain-uuid',
+        'name' => 'example.test',
+        'domain' => 'example.test',
+        'verified' => false,
+        'provider' => 'leadpush',
+        'status' => 'pending',
+        'verification' => 'pending',
+        'mail_from_domain' => 'bounces.example.test',
+        'mail_from_verified' => false,
+        'dns' => [
+            [
+                'type' => 'CNAME',
+                'name' => 'default._domainkey.example.test',
+                'value' => 'default._domainkey.smtp-domain-1.leadpush.net.',
+                'is_valid' => false,
+            ],
+            [
+                'type' => 'MX',
+                'name' => 'bounces.example.test',
+                'value' => '10 bounces.leadpush.net',
+                'is_valid' => false,
+            ],
+        ],
+        'updated_at' => '2026-06-20T12:00:00.000Z',
+        'created_at' => '2026-06-20T12:00:00.000Z',
+    ];
+}
+
+function verifiedDomainData(): array
+{
+    $data = domainData();
+    $data['verified'] = true;
+    $data['verification'] = 'completed';
+    $data['mail_from_verified'] = true;
+    $data['dns'] = array_map(function (array $record): array {
+        $record['is_valid'] = true;
+
+        return $record;
+    }, $data['dns']);
+    $data['updated_at'] = '2026-06-20T12:05:00.000Z';
+
+    return $data;
+}
+
+function createDomainData(): array
+{
+    return [
+        'name' => 'example.test',
+        'dkim_selectors' => ['default'],
+        'tracking_subdomain' => 'click',
+        'tracking_mode' => 'cloudflare',
+    ];
+}
+
+function domainAddressData(): array
+{
+    return [
+        'uuid' => 'address-uuid',
+        'domain_uuid' => domainData()['uuid'],
+        'address' => 'sender',
+        'full_address' => 'sender@example.test',
+        'provider' => 'leadpush',
+        'display_name' => 'Sender Name',
+        'verification' => 'completed',
+        'updated_at' => '2026-06-20T12:10:00.000Z',
+        'created_at' => '2026-06-20T12:10:00.000Z',
+    ];
+}
+
+function createDomainAddressData(): array
+{
+    return [
+        'address' => 'sender',
+        'display_name' => 'Sender Name',
+        'reply_to' => 'reply@example.test',
+        'company_address' => '123 Main St',
+        'company_address_2' => null,
+        'company_city' => 'New York',
+        'company_state' => 'NY',
+        'company_zip' => '10001',
+        'company_country' => 'US',
+    ];
+}
+
 function suppressionData(): array
 {
     return [

@@ -6,6 +6,7 @@ namespace Leadpush\SDK;
 
 use Composer\InstalledVersions;
 use Leadpush\SDK\Resources\Contacts;
+use Leadpush\SDK\Resources\Domains;
 use Leadpush\SDK\Resources\Fields;
 use Leadpush\SDK\Resources\Suppressions;
 use Symfony\Component\HttpClient\HttpClient as SymfonyHttpClient;
@@ -152,6 +153,14 @@ class Leadpush
     public function contacts(): Contacts
     {
         return new Contacts($this);
+    }
+
+    /**
+     * Access domain API operations.
+     */
+    public function domains(): Domains
+    {
+        return new Domains($this);
     }
 
     /**
