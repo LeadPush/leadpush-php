@@ -184,13 +184,19 @@ it('lists contacts from a paginated response', function () {
     [$client] = createClient([$response]);
 
     $contacts = $client->contacts()->list([
+        'search' => 'person',
+        'filters' => [['id' => 'subscribed', 'value' => [true]]],
         'page' => 2,
-        'per_page' => 1,
+        'perPage' => 1,
     ]);
 
     expect($contacts->data()[0])->toBeInstanceOf(ContactModel::class)
         ->and($contacts->data()[0]->uuid())->toBe(contactData()['uuid'])
         ->and($contacts->meta()->total())->toBe(88)
         ->and($contacts->meta()->hasNext())->toBeTrue()
-        ->and($response->getRequestUrl())->toBe(testBaseUrl() . '/contacts?page=2&per_page=1');
+        ->and($response->getRequestUrl())->toBe(
+            testBaseUrl()
+            . '/contacts?search=person&filters=%5B%7B%22id%22%3A%22subscribed%22%2C%22value%22%3A%5Btrue%5D%7D%5D'
+            . '&page=2&per_page=1',
+        );
 });

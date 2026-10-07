@@ -59,6 +59,23 @@ You can pass a Symfony `HttpClientInterface` as the third constructor argument f
 
 Contact methods that accept a contact identifier can use either the contact uuid or the workspace identity field value, such as an email address.
 
+**List Or Search Contacts**
+
+```php
+$contacts = $client->contacts()->list([
+    'search' => 'person@example.com',
+    'filters' => [
+        ['id' => 'subscribed', 'value' => [true]],
+        ['id' => 'provider', 'value' => ['gmail']],
+    ],
+    'page' => 1,
+    'perPage' => 25,
+]);
+```
+
+`per_page` remains supported for compatibility. Contact lists are limited to 25 records per page.
+Supported filters are `subscribed` with boolean values and `provider` with Leadpush inbox-provider identifiers.
+
 **Get A Contact**
 
 ```php
@@ -168,7 +185,7 @@ echo $page->meta()->hasNext() ? 'more' : 'done';
 **Iterate Every Model**
 
 ```php
-foreach ($client->contacts()->listAll(['per_page' => 100]) as $contact) {
+foreach ($client->contacts()->listAll(['per_page' => 25]) as $contact) {
     echo $contact->uuid();
 }
 ```
@@ -176,11 +193,114 @@ foreach ($client->contacts()->listAll(['per_page' => 100]) as $contact) {
 **Iterate Page By Page**
 
 ```php
-foreach ($client->contacts()->cursor(['per_page' => 100]) as $page) {
+foreach ($client->contacts()->cursor(['per_page' => 25]) as $page) {
     echo $page->meta()->currentPage();
     echo count($page->data());
 }
 ```
+
+## Workspace
+
+```php
+$overview = $client->workspace()->get();
+
+echo $overview['workspace']['uuid'];
+echo $overview['role'];
+echo $overview['counts']['contacts'];
+```
+
+The workspace is always derived from the API key. Workspace identifiers are not accepted as request parameters.
+
+## Campaigns
+
+**List And Get Campaigns**
+
+```php
+$campaigns = $client->campaigns()->list([
+    'search' => 'welcome',
+    'statuses' => ['draft', 'running'],
+    'page' => 1,
+    'perPage' => 25,
+]);
+
+$campaign = $client->campaigns()->get('campaign_uuid');
+```
+
+Campaign lists are limited to 25 records per page.
+
+**Campaign Metrics**
+
+```php
+$range = [
+    'start' => '2026-10-01T00:00:00Z',
+    'end' => '2026-10-31T23:59:59Z',
+    'unit' => 'day',
+];
+
+$metrics = $client->campaigns()->metrics('campaign_uuid', $range);
+```
+
+**Inspect A Campaign Execution**
+
+```php
+$inspection = $client
+    ->campaigns()
+    ->executions('campaign_uuid')
+    ->get('execution_uuid', 25);
+
+echo $inspection['execution']['status'];
+print_r($inspection['recent_steps']);
+print_r($inspection['error']);
+```
+
+Execution inspection returns at most 25 recent steps and a sanitized error. It does not expose provider credentials, raw message bodies, internal payloads, or stack traces.
+
+## Delivery Metrics
+
+```php
+$delivery = $client->metrics()->delivery([
+    'start' => '2026-10-01T00:00:00Z',
+    'end' => '2026-10-31T23:59:59Z',
+    'unit' => 'day',
+]);
+
+echo $delivery['summary']['delivered_count'];
+print_r($delivery['series']);
+```
+
+Campaign and delivery metric requests use daily buckets and may span at most 90 days.
+
+## Recent Activity
+
+```php
+$activity = $client->activity()->list([
+    'eventTypes' => ['contact_created', 'contact_updated'],
+    'search' => 'person@example.com',
+    'since' => '2026-10-01T00:00:00Z',
+    'page' => 1,
+    'perPage' => 25,
+]);
+
+print_r($activity['data']);
+```
+
+Activity lists are limited to 25 records per page and return a safe subject projection without raw activity attributes.
+
+## Read Endpoint Reference
+
+These paths are relative to the configured `/v1` API base URL.
+
+| SDK operation | REST endpoint |
+| --- | --- |
+| `workspace()->get()` | `GET /workspace` |
+| `contacts()->list(...)` | `GET /contacts` |
+| `contacts()->get($id)` | `GET /contacts/{contact}` |
+| `campaigns()->list(...)` | `GET /campaigns` |
+| `campaigns()->get($id)` | `GET /campaigns/{campaign}` |
+| `campaigns()->metrics($id, $range)` | `GET /campaigns/{campaign}/metrics` |
+| `campaigns()->executions($id)->get($executionId)` | `GET /campaigns/{campaign}/executions/{execution}` |
+| `metrics()->delivery($range)` | `GET /metrics/delivery` |
+| `activity()->list(...)` | `GET /activity` |
 
 ## Domains
 
