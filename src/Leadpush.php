@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace Leadpush\SDK;
 
 use Composer\InstalledVersions;
+use Leadpush\SDK\Resources\Activity;
+use Leadpush\SDK\Resources\Campaigns;
 use Leadpush\SDK\Resources\Contacts;
 use Leadpush\SDK\Resources\Domains;
 use Leadpush\SDK\Resources\Emails;
 use Leadpush\SDK\Resources\Fields;
+use Leadpush\SDK\Resources\Metrics;
 use Leadpush\SDK\Resources\Suppressions;
+use Leadpush\SDK\Resources\Workspace;
 use Symfony\Component\HttpClient\HttpClient as SymfonyHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -154,6 +158,26 @@ class Leadpush
     public function contacts(): Contacts
     {
         return new Contacts($this);
+    }
+
+    public function workspace(): Workspace
+    {
+        return new Workspace($this);
+    }
+
+    public function campaigns(): Campaigns
+    {
+        return new Campaigns($this);
+    }
+
+    public function metrics(): Metrics
+    {
+        return new Metrics($this);
+    }
+
+    public function activity(): Activity
+    {
+        return new Activity($this);
     }
 
     /**

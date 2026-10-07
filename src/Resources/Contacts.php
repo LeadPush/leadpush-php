@@ -6,6 +6,7 @@ namespace Leadpush\SDK\Resources;
 
 use Leadpush\SDK\Entity;
 use Leadpush\SDK\Models\ContactModel;
+use Leadpush\SDK\Responses\PaginatedResponse;
 
 /**
  * Contact API resource.
@@ -28,6 +29,25 @@ class Contacts extends Entity
     protected function modelClass(): string
     {
         return ContactModel::class;
+    }
+
+    /**
+     * @param array{
+     *     search?: string,
+     *     filters?: array<int, array{id: 'provider'|'subscribed', value: array<int, string|bool>}>,
+     *     page?: int,
+     *     perPage?: int,
+     *     per_page?: int
+     * } $params
+     */
+    public function list(array $params = []): PaginatedResponse
+    {
+        return parent::list(array_filter([
+            'search' => $params['search'] ?? null,
+            'filters' => isset($params['filters']) ? json_encode($params['filters'], JSON_THROW_ON_ERROR) : null,
+            'page' => $params['page'] ?? null,
+            'per_page' => $params['perPage'] ?? $params['per_page'] ?? null,
+        ], static fn ($value) => $value !== null));
     }
 
     /**
